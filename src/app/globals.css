@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  /* Warm cream page background — timeless Viennese caféhaus. */
+  --background: #f7f1e7;
+  /* Espresso foreground text. */
+  --foreground: #2e241b;
+  /* Brand red, traced from the Café Steinhusen storefront signage. */
+  --cs-red: #9c2b2e;
+  /* Dark chocolate/espresso for dark surfaces (nav, footer, contact block). */
+  --cs-espresso: #2a1e17;
+  /* Warm cream for text/tints on dark surfaces. */
+  --cs-cream: #f3e9d8;
+  /* Muted brass gold accent (menu cards, focus rings). */
+  --cs-gold: #c4a25a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cs-red: var(--cs-red);
+  --color-cs-espresso: var(--cs-espresso);
+  --color-cs-cream: var(--cs-cream);
+  --color-cs-gold: var(--cs-gold);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-logo: var(--font-logo);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Typography for legal pages (Impressum, Datenschutzerklärung). */
+.legal-prose {
+  font-size: clamp(14px, 1.1vw, 17px);
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--foreground) 85%, transparent);
+}
+
+.legal-prose h2 {
+  margin-top: 2.4em;
+  font-size: clamp(20px, 1.8vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--cs-espresso);
+}
+
+.legal-prose h3 {
+  margin-top: 1.8em;
+  font-size: clamp(16px, 1.3vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--cs-espresso);
+}
+
+.legal-prose h2:first-child,
+.legal-prose h3:first-child {
+  margin-top: 0;
+}
+
+.legal-prose p {
+  margin-top: 1em;
+}
+
+.legal-prose ul {
+  margin-top: 1em;
+  padding-left: 1.4em;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.legal-prose a {
+  color: var(--cs-espresso);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: opacity 0.3s;
+  word-break: break-word;
+}
+
+.legal-prose a:hover {
+  opacity: 0.7;
+}
+
+/* Gentle continuous idle float for the wordmark. */
+.cs-float {
+  transform-origin: center;
+  animation: csFloat 6s ease-in-out infinite;
+}
+
+@keyframes csFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-float {
+    animation: none;
+  }
+}
