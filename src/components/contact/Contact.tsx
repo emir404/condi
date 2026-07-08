@@ -17,18 +17,26 @@ const MAPS_LINK =
 
 const INSTAGRAM_URL = "https://www.instagram.com/cafe_konditorei/";
 
-const INFO_BLOCKS: { heading: string; lines: string[] }[] = [
+type InfoLine = { text: string; href?: string };
+
+const INFO_BLOCKS: { heading: string; lines: InfoLine[] }[] = [
   {
     heading: "Adresse",
-    lines: ["Am Burgfeld 3", "23568 Lübeck"],
+    lines: [{ text: "Am Burgfeld 3, 23568 Lübeck", href: MAPS_LINK }],
   },
   {
     heading: "Öffnungszeiten",
-    lines: ["Di – Fr 10:00 – 17:30", "Sa & So 9:00 – 17:30 · Café ab 14:00"],
+    lines: [
+      { text: "Di – Fr 10:00 – 17:30" },
+      { text: "Sa & So 9:00 – 17:30 · Café ab 14:00" },
+    ],
   },
   {
     heading: "Telefon",
-    lines: ["Tel. 0451 35285", "Fax 0451 3844828"],
+    lines: [
+      { text: "Tel. 0451 35285", href: "tel:+4945135285" },
+      { text: "Fax 0451 3844828" },
+    ],
   },
 ];
 
@@ -87,7 +95,7 @@ export default function Contact() {
       ? { opacity: 0 }
       : { opacity: 0, scale: 1.08, clipPath: "inset(0% 0% 100% 0%)" },
     visible: reduceMotion
-      ? { opacity: 1 }
+      ? { opacity: 1, scale: 1, clipPath: "inset(0% 0% 0% 0%)" }
       : {
           opacity: 1,
           scale: 1,
@@ -100,7 +108,7 @@ export default function Contact() {
       ? { opacity: 0 }
       : { opacity: 0, clipPath: "inset(100% 0% 0% 0% round 6px)" },
     visible: reduceMotion
-      ? { opacity: 1 }
+      ? { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 6px)" }
       : {
           opacity: 1,
           clipPath: "inset(0% 0% 0% 0% round 6px)",
@@ -122,7 +130,7 @@ export default function Contact() {
       ref={sectionRef}
       className="flex w-full justify-center bg-background px-[clamp(16px,4vw,64px)] pb-[clamp(24px,4vw,40px)] pt-[clamp(40px,6vw,88px)]"
     >
-      <div className="flex w-full max-w-[1440px] flex-col gap-[clamp(12px,1.5vw,24px)]">
+      <div className="flex w-full max-w-[1440px] flex-col gap-[clamp(16px,1.5vw,24px)]">
       <motion.div
         variants={container}
         initial="hidden"
@@ -142,11 +150,11 @@ export default function Contact() {
 
             <motion.h2
               variants={item}
-              className="mt-4 text-[clamp(38px,5.5vw,84px)] font-bold leading-[1.02] tracking-[-0.03em]"
+              className="mt-4 font-serif text-[clamp(42px,5.8vw,88px)] font-bold leading-[1.0] tracking-[-0.02em]"
             >
               Besuchen
               <br />
-              Sie uns
+              Sie <em className="italic text-cs-gold">uns</em>
             </motion.h2>
 
             <motion.p
@@ -198,9 +206,21 @@ export default function Contact() {
                   </h3>
                   <p className="mt-2.5 text-[clamp(13px,1vw,15px)] leading-[1.55] text-cs-cream/85">
                     {block.lines.map((line, i) => (
-                      <span key={line}>
+                      <span key={line.text}>
                         {i > 0 && <br />}
-                        {line}
+                        {line.href ? (
+                          <a
+                            href={line.href}
+                            {...(line.href.startsWith("http")
+                              ? { target: "_blank", rel: "noopener noreferrer" }
+                              : {})}
+                            className="underline decoration-cs-cream/40 underline-offset-4 transition-colors duration-300 hover:text-cs-cream hover:decoration-cs-cream focus-visible:text-cs-cream focus-visible:outline-none"
+                          >
+                            {line.text}
+                          </a>
+                        ) : (
+                          line.text
+                        )}
                       </span>
                     ))}
                   </p>
@@ -257,7 +277,7 @@ export default function Contact() {
         {/* Floating address card */}
         <motion.div
           variants={mapCard}
-          className="pointer-events-none absolute bottom-[clamp(12px,2vw,24px)] left-[clamp(12px,2vw,24px)] max-w-[calc(100%-clamp(24px,4vw,48px))]"
+          className="pointer-events-none absolute bottom-[clamp(12px,2vw,24px)] left-[clamp(12px,2vw,24px)] max-w-[min(320px,calc(100%-clamp(24px,4vw,48px)))]"
         >
           <div className="pointer-events-auto flex flex-col gap-1 rounded-[6px] bg-cs-espresso px-[clamp(18px,2vw,28px)] py-[clamp(14px,1.6vw,22px)] text-cs-cream shadow-[0_12px_40px_rgba(42,30,23,0.35)]">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cs-cream/55">

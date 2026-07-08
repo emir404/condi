@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Fraunces, Playfair_Display } from "next/font/google";
+import { Manrope, Cormorant, Grenze_Gotisch } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
@@ -9,19 +9,22 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700"],
 });
 
-const fraunces = Fraunces({
+// Heading serif: Cormorant — a high-contrast Garamond display cut. Light,
+// sharp and unmistakably Viennese next to the blackletter wordmark, where a
+// chunky slab would fight it.
+const cormorant = Cormorant({
   variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
   style: ["normal", "italic"],
 });
 
-// Elegant high-contrast serif for the Café Steinhusen wordmark.
-const playfair = Playfair_Display({
+// Wordmark face: the café's storefront still carries its historic red
+// blackletter-script channel letters. Grenze Gotisch is that Konditorei
+// lettering reimagined as a contemporary variable fraktur — warm, upright,
+// unmistakably German without tipping into Bierkeller pastiche.
+const grenzeGotisch = Grenze_Gotisch({
   variable: "--font-logo",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -38,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="de"
-      className={`${manrope.variable} ${fraunces.variable} ${playfair.variable} h-full antialiased`}
+      className={`${manrope.variable} ${cormorant.variable} ${grenzeGotisch.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <SmoothScroll>{children}</SmoothScroll>

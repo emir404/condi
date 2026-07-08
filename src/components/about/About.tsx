@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   motion,
   useMotionValueEvent,
@@ -60,6 +60,24 @@ const CARDS = [
     top: "72%",
   },
 ];
+
+/**
+ * Desktop (>=1024px) gets the sticky scroll choreography. Below that we render a
+ * plain, readable stack instead — the word-by-word reveal leaves copy near
+ * invisible and the cascading cards overlap on narrow screens. `null` until
+ * mounted so SSR and first client render agree (both fall back to mobile).
+ */
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
+}
 
 /**
  * All scroll scrubbing is driven by a single CSS variable `--p` (section scroll
@@ -154,18 +172,13 @@ function CascadeCard({
 }
 
 export default function About() {
-  const reduceMotion = useReducedMotion() ?? false;
-  const wrapRef = useRef<HTMLElement>(null);
+  const isDesktop = useIsDesktop();
+  // `null` (SSR / pre-mount) and `false` both render the mobile stack, so the
+  // desktop-only scroll hooks never run against an unattached ref.
+  return isDesktop ? <AboutDesktop /> : <AboutMobile />;
+}
 
-  const { scrollYProgress } = useScroll({
-    target: wrapRef,
-    offset: ["start start", "end end"],
-  });
-
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    wrapRef.current?.style.setProperty("--p", String(reduceMotion ? 1 : v));
-  });
-
+function useIntroVariants(reduceMotion: boolean) {
   const intro: Variants = {
     hidden: { opacity: 0, y: reduceMotion ? 0 : 24 },
     visible: {
@@ -180,6 +193,99 @@ export default function About() {
       transition: { staggerChildren: reduceMotion ? 0 : 0.09 },
     },
   };
+  return { intro, introContainer };
+}
+
+/** Mobile / SSR fallback: a plain, readable stack — no scroll scrubbing. */
+function AboutMobile() {
+  const reduceMotion = useReducedMotion() ?? false;
+  const { intro, introContainer } = useIntroVariants(reduceMotion);
+
+  const paragraphs: { text: string; className?: string }[] = [
+    { text: QUOTE, className: "font-serif text-[clamp(19px,5.4vw,24px)] italic leading-[1.4]" },
+    { text: PARAGRAPH_1 },
+    { text: PARAGRAPH_2 },
+    { text: PARAGRAPH_3, className: "font-serif italic text-cs-red" },
+  ];
+
+  return (
+    <section
+      id="cafe"
+      aria-labelledby="cafe-heading"
+      className="bg-background px-[clamp(16px,4vw,64px)] pb-[clamp(8px,3vw,24px)] pt-[clamp(48px,10vw,80px)]"
+    >
+      <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[clamp(28px,7vw,40px)]">
+        <motion.div
+          variants={introContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="flex flex-col items-start"
+        >
+          <motion.p
+            variants={intro}
+            className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/50"
+          >
+            Das Café · das norddeutsche Wiener Caféhaus
+          </motion.p>
+
+          <motion.h2 id="cafe-heading" variants={intro} className="mt-4">
+            <span className="sr-only">Café Steinhusen</span>
+            <SteinhusenMark animate={false} className="w-[clamp(220px,62vw,350px)]" />
+          </motion.h2>
+
+          <div className="mt-[clamp(20px,6vw,32px)] flex flex-col gap-[clamp(14px,4vw,20px)] text-[clamp(16px,4.2vw,18px)] font-medium leading-[1.6] tracking-[-0.01em] text-foreground/90">
+            {paragraphs.map((p) => (
+              <motion.p key={p.text} variants={intro} className={p.className}>
+                {p.text}
+              </motion.p>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={introContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          className="grid grid-cols-2 gap-[clamp(10px,3vw,16px)]"
+        >
+          {CARDS.map((card) => (
+            <motion.div
+              key={card.src}
+              variants={intro}
+              className="relative aspect-[193/226] overflow-hidden rounded-[6px] shadow-[0_10px_28px_rgba(42,30,23,0.16)]"
+            >
+              <Image
+                src={card.src}
+                alt={card.alt}
+                fill
+                sizes="50vw"
+                className="object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[rgba(42,30,23,0.10)]" />
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/** Desktop (>=1024px): sticky scroll choreography driven by the `--p` variable. */
+function AboutDesktop() {
+  const reduceMotion = useReducedMotion() ?? false;
+  const wrapRef = useRef<HTMLElement>(null);
+  const { intro, introContainer } = useIntroVariants(reduceMotion);
+
+  const { scrollYProgress } = useScroll({
+    target: wrapRef,
+    offset: ["start start", "end end"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    wrapRef.current?.style.setProperty("--p", String(reduceMotion ? 1 : v));
+  });
 
   return (
     <section
@@ -227,7 +333,7 @@ export default function About() {
               <span className="sr-only">Café Steinhusen</span>
               <SteinhusenMark
                 animate={false}
-                className="w-[clamp(200px,28vw,340px)]"
+                className="w-[clamp(220px,30vw,370px)]"
               />
             </motion.h2>
 

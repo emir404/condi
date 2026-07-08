@@ -53,7 +53,7 @@ export default function LegalShell({
             <SteinhusenMark
               animate={false}
               light
-              className="w-[clamp(120px,14vw,168px)]"
+              className="w-[clamp(140px,16vw,195px)]"
             />
           </Link>
           <Link

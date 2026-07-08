@@ -3,15 +3,22 @@
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import SteinhusenMark from "@/components/hero/SteinhusenMark";
+import {
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  MAPS_URL,
+  PHONE_DISPLAY,
+  PHONE_HREF,
+} from "@/lib/site";
 
 type LinkItem = { label: string; href: string };
 
 const NAV_LINKS: LinkItem[] = [
-  { label: "Startseite", href: "#" },
-  { label: "Unser Angebot", href: "#angebot" },
-  { label: "Das Café", href: "#cafe" },
-  { label: "Der Teeraum", href: "#teeraum" },
-  { label: "Kontakt", href: "#kontakt" },
+  { label: "Startseite", href: "/" },
+  { label: "Zum Mitnehmen", href: "/mitnehmen" },
+  { label: "Café & Frühstück", href: "/cafe" },
+  { label: "Torten auf Bestellung", href: "/bestellen" },
+  { label: "Kontakt", href: "/#kontakt" },
 ];
 
 const LEGAL_LINKS: LinkItem[] = [
@@ -19,11 +26,6 @@ const LEGAL_LINKS: LinkItem[] = [
   { label: "Datenschutzerklärung", href: "/datenschutz" },
 ];
 
-const CONTACT_LINES = [
-  "Am Burgfeld 3",
-  "23568 Lübeck",
-  "Tel. 0451 35285",
-];
 
 const HOURS: [string, string][] = [
   ["Dienstag – Freitag", "10:00 – 17:30 Uhr"],
@@ -71,7 +73,7 @@ export default function Footer() {
               <SteinhusenMark
                 animate={false}
                 light
-                className="w-[clamp(150px,18vw,200px)]"
+                className="w-[clamp(170px,20vw,230px)]"
               />
             </Link>
             <p className="max-w-[34ch] font-serif text-[clamp(13px,1vw,15px)] italic leading-[1.55] text-cs-cream/80">
@@ -98,12 +100,22 @@ export default function Footer() {
           <motion.div variants={item} className="flex flex-col gap-4">
             <FooterHeading>Kontakt</FooterHeading>
             <address className="flex flex-col gap-2.5 text-[clamp(13px,1vw,15px)] not-italic leading-[1.5] text-cs-cream/85">
-              {CONTACT_LINES.map((line) => (
-                <span key={line}>{line}</span>
-              ))}
-              <FooterLink href="https://www.instagram.com/cafe_konditorei/">
-                @cafe_konditorei
-              </FooterLink>
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-fit underline decoration-cs-cream/40 underline-offset-4 transition-colors duration-300 hover:text-cs-cream hover:decoration-cs-cream focus-visible:text-cs-cream focus-visible:outline-none"
+              >
+                Am Burgfeld 3<br />
+                23568 Lübeck
+              </a>
+              <a
+                href={PHONE_HREF}
+                className="w-fit underline decoration-cs-cream/40 underline-offset-4 transition-colors duration-300 hover:text-cs-cream hover:decoration-cs-cream focus-visible:text-cs-cream focus-visible:outline-none"
+              >
+                Tel. {PHONE_DISPLAY}
+              </a>
+              <FooterLink href={INSTAGRAM_URL}>{INSTAGRAM_HANDLE}</FooterLink>
             </address>
           </motion.div>
 
@@ -166,14 +178,20 @@ function FooterLink({
   children: React.ReactNode;
 }) {
   const external = href.startsWith("http");
+  const className =
+    "w-fit text-[clamp(13px,1vw,15px)] text-cs-cream/85 underline-offset-4 transition-colors duration-300 hover:text-cs-cream hover:underline focus-visible:text-cs-cream focus-visible:underline focus-visible:outline-none";
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+
   return (
-    <a
-      href={href}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noopener noreferrer" : undefined}
-      className="w-fit text-[clamp(13px,1vw,15px)] text-cs-cream/85 underline-offset-4 transition-colors duration-300 hover:text-cs-cream hover:underline focus-visible:text-cs-cream focus-visible:underline focus-visible:outline-none"
-    >
+    <Link href={href} className={className}>
       {children}
-    </a>
+    </Link>
   );
 }

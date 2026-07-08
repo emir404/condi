@@ -96,7 +96,7 @@ export default function SundayBreakfast() {
       ? { opacity: 0 }
       : { opacity: 0, scale: 1.08, clipPath: "inset(0% 0% 100% 0%)" },
     visible: reduceMotion
-      ? { opacity: 1 }
+      ? { opacity: 1, scale: 1, clipPath: "inset(0% 0% 0% 0%)" }
       : {
           opacity: 1,
           scale: 1,
@@ -109,7 +109,7 @@ export default function SundayBreakfast() {
       ? { opacity: 0 }
       : { opacity: 0, scale: 0.5, rotate: -16 },
     visible: reduceMotion
-      ? { opacity: 1 }
+      ? { opacity: 1, scale: 1, rotate: 0 }
       : {
           opacity: 1,
           scale: 1,
@@ -140,8 +140,8 @@ export default function SundayBreakfast() {
             <SundayBadge reduceMotion={reduceMotion} className="size-full" />
           </motion.div>
 
-          {/* Copy side */}
-          <div className="flex flex-col justify-between gap-[clamp(36px,4.5vw,64px)] px-[clamp(24px,4vw,72px)] py-[clamp(36px,4.5vw,72px)] text-cs-espresso">
+          {/* Copy side — extra top padding below lg keeps content clear of the overhanging badge. */}
+          <div className="flex flex-col justify-between gap-[clamp(36px,4.5vw,64px)] px-[clamp(24px,4vw,72px)] pb-[clamp(36px,4.5vw,72px)] pt-[clamp(52px,9vw,72px)] text-cs-espresso lg:pt-[clamp(36px,4.5vw,72px)]">
             <div className="flex flex-col items-start">
               {/* Right padding below lg keeps the eyebrow clear of the overhanging badge. */}
               <motion.p
@@ -207,10 +207,10 @@ export default function SundayBreakfast() {
               <div className="grid grid-cols-1 gap-x-[clamp(16px,2vw,32px)] gap-y-6 sm:grid-cols-3">
                 {FACTS.map((fact) => (
                   <motion.div key={fact.heading} variants={item}>
-                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cs-espresso/60">
+                    <h3 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-cs-espresso/60">
                       {fact.heading}
                     </h3>
-                    <p className="mt-2.5 text-[clamp(13px,1vw,15px)] font-semibold leading-[1.55] text-cs-espresso/90">
+                    <p className="mt-2.5 text-[clamp(14px,1vw,15px)] font-semibold leading-[1.55] text-cs-espresso/90">
                       {fact.lines.map((line, i) => (
                         <span key={line}>
                           {i > 0 && <br />}
