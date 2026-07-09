@@ -38,7 +38,6 @@ export default function Footer(props: FooterProps = {}) {
   const year = new Date().getFullYear();
 
   const quote = props.quote ?? defaults.settings.quote;
-  const tagline = props.tagline ?? defaults.settings.tagline;
   const addressLines = props.addressLines ?? defaults.settings.addressLines;
   const HOURS = props.hours ?? defaults.settings.hours;
   const PHONE_DISPLAY = props.phoneDisplay ?? defaults.settings.contact.phoneDisplay;
@@ -89,9 +88,6 @@ export default function Footer(props: FooterProps = {}) {
             </Link>
             <p className="max-w-[34ch] font-serif text-[clamp(13px,1vw,15px)] italic leading-[1.55] text-cs-cream/80">
               {quote}
-            </p>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cs-cream/60">
-              {tagline}
             </p>
           </motion.div>
 
