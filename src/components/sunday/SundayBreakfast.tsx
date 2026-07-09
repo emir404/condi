@@ -3,25 +3,22 @@
 import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import { BreadIcon } from "@/components/menu/MenuIcons";
+import Emphasize from "@/components/text/Emphasize";
+import * as defaults from "@/lib/defaults";
+import type { Img } from "@/lib/cms";
 
 const INSTAGRAM_URL = "https://www.instagram.com/cafe_konditorei/";
 const PHONE_DISPLAY = "0451 35285";
 const PHONE_HREF = "tel:+4945135285";
 
-const FACTS: { heading: string; lines: string[] }[] = [
-  {
-    heading: "Wann",
-    lines: ["Auf Anfrage,", "nach Absprache"],
-  },
-  {
-    heading: "Für wen",
-    lines: ["Bis zu", "45 Personen"],
-  },
-  {
-    heading: "Was Sie erwartet",
-    lines: ["Separater", "Raum"],
-  },
-];
+type SundayBreakfastProps = {
+  eyebrow?: string;
+  /** Heading with an optional *italic* accent marked by asterisks. */
+  heading?: string;
+  body?: string;
+  image?: Img;
+  facts?: { heading: string; lines: string[] }[];
+};
 
 /** Rotating stamp: circular text ring around the bread icon. */
 function SundayBadge({
@@ -66,8 +63,15 @@ function SundayBadge({
   );
 }
 
-export default function SundayBreakfast() {
+export default function SundayBreakfast(props: SundayBreakfastProps = {}) {
   const reduceMotion = useReducedMotion() ?? false;
+
+  const d = defaults.bestellen.teeraum;
+  const eyebrow = props.eyebrow ?? d.eyebrow;
+  const heading = props.heading ?? d.heading;
+  const body = props.body ?? d.body;
+  const bgImage = props.image ?? d.image;
+  const FACTS = props.facts ?? d.facts;
 
   const container: Variants = {
     hidden: {},
@@ -148,7 +152,7 @@ export default function SundayBreakfast() {
                 variants={item}
                 className="pr-[clamp(96px,28vw,148px)] text-[11px] font-semibold uppercase tracking-[0.16em] text-cs-espresso/60 lg:pr-0"
               >
-                Der Teeraum · Veranstaltungen
+                {eyebrow}
               </motion.p>
 
               <motion.h2
@@ -156,18 +160,14 @@ export default function SundayBreakfast() {
                 variants={item}
                 className="mt-4 max-w-[16ch] font-serif text-[clamp(34px,4.6vw,68px)] font-bold leading-[1.04] tracking-[-0.02em]"
               >
-                Feiern Sie{" "}
-                <em className="italic">im Teeraum</em>
+                <Emphasize text={heading} className="italic" />
               </motion.h2>
 
               <motion.p
                 variants={item}
                 className="mt-6 max-w-[46ch] text-[clamp(15px,1.2vw,18px)] font-medium leading-[1.6] text-cs-espresso/85"
               >
-                In unserem separaten Teeraum feiern Sie ganz ungestört: Wir
-                richten Ihre Veranstaltung für bis zu 45 Personen aus — vom
-                Familienfest bis zur Feier mit Freunden. Sprechen Sie uns
-                einfach an.
+                {body}
               </motion.p>
 
               <motion.div
@@ -235,8 +235,8 @@ export default function SundayBreakfast() {
               transition={{ type: "spring", stiffness: 200, damping: 26 }}
             >
               <Image
-                src="/images/teeraum/saal.jpg"
-                alt="Lange festlich gedeckte Tafel im separaten Teeraum des Café Steinhusen"
+                src={bgImage.src}
+                alt={bgImage.alt}
                 fill
                 sizes="(max-width: 1024px) 100vw, 45vw"
                 className="object-cover"

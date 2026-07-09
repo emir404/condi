@@ -10,56 +10,33 @@ import {
   type Variants,
 } from "motion/react";
 import SteinhusenMark from "@/components/hero/SteinhusenMark";
+import type { Img } from "@/lib/cms";
 
-const QUOTE = "\u201EThere is beauty in timeless things.\u201C";
+export type AboutContent = {
+  eyebrow: string;
+  quote: string;
+  paragraph1: string;
+  paragraph2: string;
+  closing: string;
+  cards: Img[];
+};
 
-const PARAGRAPH_1 =
-  "Das Café Steinhusen ist der Versuch des Wiener Cafés in norddeutscher Moderne — in historischen Räumlichkeiten von 1899, einst als Ferienhaus vor den Toren Lübecks gebaut.";
-
-const PARAGRAPH_2 =
-  "1972 mit 40 Plätzen gestartet, wurde das Haus mehrmals umgebaut und erweitert — und ist dabei doch nie stehen geblieben.";
-
-const PARAGRAPH_3 = "Seien Sie unser Gast — be our guest.";
-
-/** Zig-zag cascade (percentages of the photo column), following the Figma layout. */
-const CARDS = [
-  {
-    src: "/images/about/cafe-00.jpg",
-    alt: "Eleganter Gastraum mit langer gedeckter Tafel im Café Steinhusen",
-    left: "58%",
-    top: "0%",
-  },
-  {
-    src: "/images/about/cafe-01.jpg",
-    alt: "Wintergarten mit warmem Licht und Lüstern im Café Steinhusen",
-    left: "36%",
-    top: "12.5%",
-  },
-  {
-    src: "/images/about/cafe-02.jpg",
-    alt: "Gemütliche Sitzecke im Café Steinhusen",
-    left: "16%",
-    top: "27%",
-  },
-  {
-    src: "/images/about/cafe-03.jpg",
-    alt: "Torte aus eigener Herstellung im Café Steinhusen",
-    left: "2%",
-    top: "42%",
-  },
-  {
-    src: "/images/about/cafe-04.jpg",
-    alt: "Himbeer-Baiser-Törtchen aus der Konditorei",
-    left: "12%",
-    top: "57.5%",
-  },
-  {
-    src: "/images/about/cafe-05.jpg",
-    alt: "Baiser-Kuchen mit frischen Erdbeeren",
-    left: "24%",
-    top: "72%",
-  },
+/** Zig-zag cascade positions (percentages of the photo column), per Figma. */
+const POSITIONS: { left: string; top: string }[] = [
+  { left: "58%", top: "0%" },
+  { left: "36%", top: "12.5%" },
+  { left: "16%", top: "27%" },
+  { left: "2%", top: "42%" },
+  { left: "12%", top: "57.5%" },
+  { left: "24%", top: "72%" },
 ];
+
+type Card = Img & { left: string; top: string };
+
+/** Merge CMS images with their fixed cascade positions (cycling if needed). */
+function toCards(images: Img[]): Card[] {
+  return images.map((img, i) => ({ ...img, ...POSITIONS[i % POSITIONS.length] }));
+}
 
 /**
  * Desktop (>=1024px) gets the sticky scroll choreography. Below that we render a
@@ -130,7 +107,7 @@ function CascadeCard({
   index,
   reduceMotion,
 }: {
-  card: (typeof CARDS)[number];
+  card: Card;
   index: number;
   reduceMotion: boolean;
 }) {
@@ -171,11 +148,15 @@ function CascadeCard({
   );
 }
 
-export default function About() {
+export default function About(content: AboutContent) {
   const isDesktop = useIsDesktop();
   // `null` (SSR / pre-mount) and `false` both render the mobile stack, so the
   // desktop-only scroll hooks never run against an unattached ref.
-  return isDesktop ? <AboutDesktop /> : <AboutMobile />;
+  return isDesktop ? (
+    <AboutDesktop content={content} />
+  ) : (
+    <AboutMobile content={content} />
+  );
 }
 
 function useIntroVariants(reduceMotion: boolean) {
@@ -197,15 +178,16 @@ function useIntroVariants(reduceMotion: boolean) {
 }
 
 /** Mobile / SSR fallback: a plain, readable stack — no scroll scrubbing. */
-function AboutMobile() {
+function AboutMobile({ content }: { content: AboutContent }) {
   const reduceMotion = useReducedMotion() ?? false;
   const { intro, introContainer } = useIntroVariants(reduceMotion);
+  const cards = toCards(content.cards);
 
   const paragraphs: { text: string; className?: string }[] = [
-    { text: QUOTE, className: "font-serif text-[clamp(19px,5.4vw,24px)] italic leading-[1.4]" },
-    { text: PARAGRAPH_1 },
-    { text: PARAGRAPH_2 },
-    { text: PARAGRAPH_3, className: "font-serif italic text-cs-red" },
+    { text: content.quote, className: "font-serif text-[clamp(19px,5.4vw,24px)] italic leading-[1.4]" },
+    { text: content.paragraph1 },
+    { text: content.paragraph2 },
+    { text: content.closing, className: "font-serif italic text-cs-red" },
   ];
 
   return (
@@ -226,7 +208,7 @@ function AboutMobile() {
             variants={intro}
             className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/50"
           >
-            Das Café · das norddeutsche Wiener Caféhaus
+            {content.eyebrow}
           </motion.p>
 
           <motion.h2 id="cafe-heading" variants={intro} className="mt-4">
@@ -250,7 +232,7 @@ function AboutMobile() {
           viewport={{ once: true, amount: 0.15 }}
           className="grid grid-cols-2 gap-[clamp(10px,3vw,16px)]"
         >
-          {CARDS.map((card) => (
+          {cards.map((card) => (
             <motion.div
               key={card.src}
               variants={intro}
@@ -273,10 +255,11 @@ function AboutMobile() {
 }
 
 /** Desktop (>=1024px): sticky scroll choreography driven by the `--p` variable. */
-function AboutDesktop() {
+function AboutDesktop({ content }: { content: AboutContent }) {
   const reduceMotion = useReducedMotion() ?? false;
   const wrapRef = useRef<HTMLElement>(null);
   const { intro, introContainer } = useIntroVariants(reduceMotion);
+  const cards = toCards(content.cards);
 
   const { scrollYProgress } = useScroll({
     target: wrapRef,
@@ -322,7 +305,7 @@ function AboutDesktop() {
               variants={intro}
               className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/50"
             >
-              Das Café · das norddeutsche Wiener Caféhaus
+              {content.eyebrow}
             </motion.p>
 
             <motion.h2
@@ -338,16 +321,16 @@ function AboutDesktop() {
             </motion.h2>
 
             <div className="mt-[clamp(24px,3vw,44px)] flex flex-col gap-[clamp(16px,2vw,28px)] text-[clamp(16px,1.55vw,22px)] font-medium leading-[1.45] tracking-[-0.01em] text-foreground">
-              <RevealParagraph text={QUOTE} start={0.03} end={0.13} className="font-serif italic" />
-              <RevealParagraph text={PARAGRAPH_1} start={0.13} end={0.34} />
-              <RevealParagraph text={PARAGRAPH_2} start={0.34} end={0.56} />
-              <RevealParagraph text={PARAGRAPH_3} start={0.56} end={0.68} className="font-serif italic" />
+              <RevealParagraph text={content.quote} start={0.03} end={0.13} className="font-serif italic" />
+              <RevealParagraph text={content.paragraph1} start={0.13} end={0.34} />
+              <RevealParagraph text={content.paragraph2} start={0.34} end={0.56} />
+              <RevealParagraph text={content.closing} start={0.56} end={0.68} className="font-serif italic" />
             </div>
           </motion.div>
 
           {/* Cascading photo cards */}
           <div className="relative h-[min(52vh,460px)] lg:h-[min(78vh,700px)]">
-            {CARDS.map((card, i) => (
+            {cards.map((card, i) => (
               <CascadeCard key={card.src} card={card} index={i} reduceMotion={reduceMotion} />
             ))}
           </div>

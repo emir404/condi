@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Manrope, Cormorant, Grenze_Gotisch } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
-import "./globals.css";
+import { getCms } from "@/lib/cms";
+import * as defaults from "@/lib/defaults";
+import "../globals.css";
 
 const manrope = Manrope({
   variable: "--font-sans",
@@ -27,11 +29,14 @@ const grenzeGotisch = Grenze_Gotisch({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Café Steinhusen — das norddeutsche Wiener Caféhaus | Lübeck",
-  description:
-    "Café Steinhusen in Lübeck: über 30 Tortensorten aus eigener Herstellung, Kleingebäck, Confiserie, Eis aus eigener Herstellung und belegte Brötchen. Am Burgfeld 3, 23568 Lübeck.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const payload = await getCms();
+  const settings = await payload.findGlobal({ slug: "site-settings" });
+  return {
+    title: settings.meta?.title ?? defaults.settings.meta.title,
+    description: settings.meta?.description ?? defaults.settings.meta.description,
+  };
+}
 
 export default function RootLayout({
   children,

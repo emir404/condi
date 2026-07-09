@@ -3,67 +3,36 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "motion/react";
-import {
-  CakeIcon,
-  CoffeeIcon,
-  CupcakeIcon,
-  type MenuIconProps,
-} from "@/components/menu/MenuIcons";
+import { iconFor } from "@/components/menu/MenuIcons";
+import Emphasize from "@/components/text/Emphasize";
+import type { Img } from "@/lib/cms";
 
-type Offering = {
+export type Offering = {
   number: string;
+  /** Title with an optional *italic* accent marked by asterisks. */
   title: string;
-  titleItalic?: string;
   description: string;
   href: string;
   cta: string;
-  image: string;
-  alt: string;
-  Icon: (props: MenuIconProps) => React.ReactElement;
+  image: Img;
+  icon?: string | null;
 };
 
-/** The three lines of business, in the order of the customer journey. */
-const OFFERINGS: Offering[] = [
-  {
-    number: "01",
-    title: "Zum",
-    titleItalic: "Mitnehmen",
-    description:
-      "Über 30 Tortensorten, Confiserie, Kleingebäck und Eis aus eigener Herstellung — frisch aus der Vitrine für zu Hause.",
-    href: "/mitnehmen",
-    cta: "Vitrine ansehen",
-    image: "/images/menu/torten.jpg",
-    alt: "Torte aus eigener Herstellung mit Schokolade und Kirschen",
-    Icon: CakeIcon,
-  },
-  {
-    number: "02",
-    title: "Café &",
-    titleItalic: "Frühstück",
-    description:
-      "Setzen Sie sich: Frühstück, Kaffee und ein Stück Torte im lichten Wintergarten unseres Wiener Caféhauses.",
-    href: "/cafe",
-    cta: "Ins Café",
-    image: "/images/hero/cafe.jpg",
-    alt: "Lichtdurchfluteter Wintergarten mit warmem Licht im Café Steinhusen",
-    Icon: CoffeeIcon,
-  },
-  {
-    number: "03",
-    title: "Torten auf",
-    titleItalic: "Bestellung",
-    description:
-      "Motiv- und Festtagstorten für Ihre große Runde — und der Teeraum für Feiern mit bis zu 45 Gästen.",
-    href: "/bestellen",
-    cta: "Torte bestellen",
-    image: "/images/teeraum/saal.jpg",
-    alt: "Lange festlich gedeckte Tafel im separaten Teeraum des Café Steinhusen",
-    Icon: CupcakeIcon,
-  },
-];
+type OfferingsHubProps = {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  offerings: Offering[];
+};
 
-export default function OfferingsHub() {
+export default function OfferingsHub({
+  eyebrow,
+  heading,
+  intro: introText,
+  offerings,
+}: OfferingsHubProps) {
   const reduceMotion = useReducedMotion();
+  const OFFERINGS = offerings;
 
   const intro: Variants = {
     hidden: {},
@@ -115,22 +84,20 @@ export default function OfferingsHub() {
             variants={introItem}
             className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/50"
           >
-            Unser Angebot · seit 1972
+            {eyebrow}
           </motion.p>
           <motion.h2
             id="angebot-heading"
             variants={introItem}
             className="mt-4 font-serif text-[clamp(32px,4.6vw,60px)] font-bold leading-[1.05] tracking-[-0.02em] text-cs-espresso"
           >
-            Ein Haus, <em className="italic text-cs-red">drei Wege</em>
+            <Emphasize text={heading} className="italic text-cs-red" />
           </motion.h2>
           <motion.p
             variants={introItem}
             className="mt-5 text-[clamp(15px,1.4vw,19px)] font-medium leading-[1.6] tracking-[-0.01em] text-foreground/80"
           >
-            Konditorei zum Mitnehmen, Wiener Caféhaus zum Verweilen und
-            Festtagstorten auf Bestellung — Café Steinhusen ist größer, als es
-            die Vitrine verrät.
+            {introText}
           </motion.p>
         </motion.div>
 
@@ -142,7 +109,9 @@ export default function OfferingsHub() {
           viewport={{ once: true, amount: 0.15 }}
           className="mt-[clamp(28px,4vw,56px)] grid grid-cols-1 gap-[clamp(16px,1.6vw,24px)] sm:grid-cols-2 lg:grid-cols-3"
         >
-          {OFFERINGS.map(({ number, title, titleItalic, description, href, cta, image, alt, Icon }) => (
+          {OFFERINGS.map(({ number, title, description, href, cta, image, icon }) => {
+            const Icon = iconFor(icon);
+            return (
             <motion.div key={href} variants={card}>
               <Link
                 href={href}
@@ -154,8 +123,8 @@ export default function OfferingsHub() {
                   transition={{ type: "spring", stiffness: 200, damping: 26 }}
                 >
                   <Image
-                    src={image}
-                    alt={alt}
+                    src={image.src}
+                    alt={image.alt}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover"
@@ -170,14 +139,15 @@ export default function OfferingsHub() {
                   <span className="font-serif text-[clamp(14px,1.1vw,16px)] font-semibold tracking-[0.1em]">
                     {number}
                   </span>
-                  <Icon className="size-8 transition-transform duration-500 group-hover:-translate-y-0.5" />
+                  {Icon && (
+                    <Icon className="size-8 transition-transform duration-500 group-hover:-translate-y-0.5" />
+                  )}
                 </div>
 
                 {/* Title + copy, bottom */}
                 <div className="relative p-[clamp(20px,2vw,32px)]">
                   <h3 className="font-serif text-[clamp(26px,2.6vw,38px)] font-bold leading-[1.02] tracking-[-0.01em] text-cs-cream">
-                    {title}{" "}
-                    <em className="italic text-cs-gold">{titleItalic}</em>
+                    <Emphasize text={title} className="italic text-cs-gold" />
                   </h3>
                   <p className="mt-3 max-w-[32ch] text-[clamp(13px,1vw,15px)] font-medium leading-[1.5] text-cs-cream/85">
                     {description}
@@ -194,7 +164,8 @@ export default function OfferingsHub() {
                 </div>
               </Link>
             </motion.div>
-          ))}
+            );
+          })}
         </motion.div>
       </div>
     </section>

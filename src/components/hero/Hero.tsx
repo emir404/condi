@@ -11,32 +11,18 @@ import {
 } from "motion/react";
 import SteinhusenMark from "./SteinhusenMark";
 import SiteNav from "@/components/nav/SiteNav";
-import { MAPS_URL } from "@/lib/site";
+import type { Img } from "@/lib/cms";
 
-const COLUMNS: { label: string; value: string; href?: string; wide?: boolean }[] = [
-  { label: "Öffnungszeiten", value: "Di–Fr · 10–17:30 Uhr" },
-  { label: "Wochenende", value: "Sa & So · 9–17:30 Uhr" },
-  { label: "Café mit Service", value: "ab 14:00 Uhr" },
-  { label: "Adresse", value: "Am Burgfeld 3, 23568 Lübeck", href: MAPS_URL },
-  { label: "Das norddeutsche Wiener Caféhaus", value: "Seit 1972 in Lübeck", wide: true },
-];
+type Column = { label: string; value: string; href?: string; wide?: boolean };
 
-const IMAGES = [
-  {
-    src: "/images/hero/storefront.jpg",
-    alt: "Das Café Steinhusen am Burgfeld 3 in Lübeck mit dem historischen Schriftzug über dem Eingang",
-  },
-  {
-    src: "/images/hero/cafe.jpg",
-    alt: "Lichtdurchfluteter Wintergarten mit warmem Licht im Café Steinhusen",
-  },
-  {
-    src: "/images/hero/saal.jpg",
-    alt: "Eleganter Gastraum mit langer gedeckter Tafel im Café Steinhusen",
-  },
-];
+type HeroProps = {
+  columns: Column[];
+  images: Img[];
+};
 
-export default function Hero() {
+export default function Hero({ columns, images }: HeroProps) {
+  const COLUMNS = columns;
+  const IMAGES = images;
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
 

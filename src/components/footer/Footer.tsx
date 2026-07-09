@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import SteinhusenMark from "@/components/hero/SteinhusenMark";
-import {
-  INSTAGRAM_HANDLE,
-  INSTAGRAM_URL,
-  MAPS_URL,
-  PHONE_DISPLAY,
-  PHONE_HREF,
-} from "@/lib/site";
+import * as defaults from "@/lib/defaults";
 
 type LinkItem = { label: string; href: string };
 
@@ -26,16 +20,33 @@ const LEGAL_LINKS: LinkItem[] = [
   { label: "Datenschutzerklärung", href: "/datenschutz" },
 ];
 
+type FooterProps = {
+  quote?: string;
+  tagline?: string;
+  addressLines?: [string, string];
+  hours?: [string, string][];
+  phoneDisplay?: string;
+  phoneHref?: string;
+  instagramHandle?: string;
+  instagramUrl?: string;
+  mapsUrl?: string;
+  companyName?: string;
+};
 
-const HOURS: [string, string][] = [
-  ["Dienstag – Freitag", "10:00 – 17:30 Uhr"],
-  ["Samstag & Sonntag", "9:00 – 17:30 Uhr"],
-  ["Café mit Service", "ab 14:00 Uhr"],
-];
-
-export default function Footer() {
+export default function Footer(props: FooterProps = {}) {
   const reduceMotion = useReducedMotion();
   const year = new Date().getFullYear();
+
+  const quote = props.quote ?? defaults.settings.quote;
+  const tagline = props.tagline ?? defaults.settings.tagline;
+  const addressLines = props.addressLines ?? defaults.settings.addressLines;
+  const HOURS = props.hours ?? defaults.settings.hours;
+  const PHONE_DISPLAY = props.phoneDisplay ?? defaults.settings.contact.phoneDisplay;
+  const PHONE_HREF = props.phoneHref ?? `tel:${defaults.settings.contact.phoneNumber}`;
+  const INSTAGRAM_HANDLE = props.instagramHandle ?? defaults.settings.contact.instagramHandle;
+  const INSTAGRAM_URL = props.instagramUrl ?? defaults.settings.contact.instagramUrl;
+  const MAPS_URL = props.mapsUrl ?? defaults.settings.contact.mapsLink;
+  const companyName = props.companyName ?? defaults.settings.companyName;
 
   const container: Variants = {
     hidden: {},
@@ -77,10 +88,10 @@ export default function Footer() {
               />
             </Link>
             <p className="max-w-[34ch] font-serif text-[clamp(13px,1vw,15px)] italic leading-[1.55] text-cs-cream/80">
-              „There is beauty in timeless things.“
+              {quote}
             </p>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cs-cream/60">
-              Das norddeutsche Wiener Caféhaus · Lübeck
+              {tagline}
             </p>
           </motion.div>
 
@@ -106,8 +117,9 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="w-fit underline decoration-cs-cream/40 underline-offset-4 transition-colors duration-300 hover:text-cs-cream hover:decoration-cs-cream focus-visible:text-cs-cream focus-visible:outline-none"
               >
-                Am Burgfeld 3<br />
-                23568 Lübeck
+                {addressLines[0]}
+                <br />
+                {addressLines[1]}
               </a>
               <a
                 href={PHONE_HREF}
@@ -142,7 +154,7 @@ export default function Footer() {
           className="flex flex-col gap-4 text-[12px] leading-[1.5] text-cs-cream/70 md:flex-row md:items-center md:justify-between"
         >
           <p suppressHydrationWarning>
-            © {year} Café Steinhusen GmbH · Alle Rechte vorbehalten.
+            © {year} {companyName} · Alle Rechte vorbehalten.
           </p>
 
           <nav aria-label="Rechtliches" className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -155,7 +167,7 @@ export default function Footer() {
         </motion.div>
 
         <p className="mt-4 text-[11px] leading-[1.5] text-cs-cream/45">
-          Café Steinhusen GmbH · Am Burgfeld 3, 23568 Lübeck
+          {companyName} · {addressLines.join(", ")}
         </p>
       </motion.div>
     </footer>

@@ -9,54 +9,70 @@ import {
   useTransform,
   type Variants,
 } from "motion/react";
-
-const MAPS_EMBED_SRC =
-  "https://maps.google.de/maps?hl=de&q=Caf%C3%A9%20Steinhusen%20Am%20Burgfeld%203%20L%C3%BCbeck&t=&z=15&ie=utf8&iwloc=b&output=embed";
-const MAPS_LINK =
-  "https://www.google.com/maps/search/?api=1&query=Caf%C3%A9%20Steinhusen%20Am%20Burgfeld%203%2023568%20L%C3%BCbeck";
-
-const INSTAGRAM_URL = "https://www.instagram.com/cafe_konditorei/";
+import Emphasize from "@/components/text/Emphasize";
+import type { Img } from "@/lib/cms";
 
 type InfoLine = { text: string; href?: string };
 
-const INFO_BLOCKS: { heading: string; lines: InfoLine[] }[] = [
-  {
-    heading: "Adresse",
-    lines: [{ text: "Am Burgfeld 3, 23568 Lübeck", href: MAPS_LINK }],
-  },
-  {
-    heading: "Öffnungszeiten",
-    lines: [
-      { text: "Di – Fr 10:00 – 17:30" },
-      { text: "Sa & So 9:00 – 17:30 · Café ab 14:00" },
-    ],
-  },
-  {
-    heading: "Telefon",
-    lines: [
-      { text: "Tel. 0451 35285", href: "tel:+4945135285" },
-      { text: "Fax 0451 3844828" },
-    ],
-  },
-];
+type ContactProps = {
+  eyebrow: string;
+  /** Heading with an optional *italic* accent marked by asterisks. */
+  heading: string;
+  text: string;
+  image: Img;
+  umgebung: string[];
+  addressLines: [string, string];
+  hours: [string, string][];
+  phoneDisplay: string;
+  phoneHref: string;
+  faxDisplay?: string;
+  instagramHandle: string;
+  instagramUrl: string;
+  mapsLink: string;
+  mapsEmbedSrc: string;
+};
 
-/** Nearby Lübeck sights with walking distances (from the condi.de contact page). */
-const UMGEBUNG: string[] = [
-  "Burgtor · 500 m",
-  "Hansemuseum · 700 m",
-  "Heilige-Geist-Hospital · 750 m",
-  "Jakobikirche · 900 m",
-  "Buddenbrookhaus · 1,3 km",
-  "Marienkirche · 1,4 km",
-  "Rathaus · 1,4 km",
-  "Lisa von Lübeck · 1,8 km",
-  "Holstentor · 1,9 km",
-  "Lübecker Dom · 2,1 km",
-];
-
-export default function Contact() {
+export default function Contact({
+  eyebrow,
+  heading,
+  text,
+  image: contactImg,
+  umgebung,
+  addressLines,
+  hours,
+  phoneDisplay,
+  phoneHref,
+  faxDisplay,
+  instagramHandle,
+  instagramUrl,
+  mapsLink,
+  mapsEmbedSrc,
+}: ContactProps) {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
+
+  const MAPS_EMBED_SRC = mapsEmbedSrc;
+  const MAPS_LINK = mapsLink;
+  const INSTAGRAM_URL = instagramUrl;
+  const UMGEBUNG = umgebung;
+
+  const INFO_BLOCKS: { heading: string; lines: InfoLine[] }[] = [
+    {
+      heading: "Adresse",
+      lines: [{ text: addressLines.join(", "), href: MAPS_LINK }],
+    },
+    {
+      heading: "Öffnungszeiten",
+      lines: hours.map(([label, value]) => ({ text: `${label} ${value}` })),
+    },
+    {
+      heading: "Telefon",
+      lines: [
+        { text: `Tel. ${phoneDisplay}`, href: phoneHref },
+        ...(faxDisplay ? [{ text: `Fax ${faxDisplay}` }] : []),
+      ],
+    },
+  ];
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -145,25 +161,21 @@ export default function Contact() {
               variants={item}
               className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cs-cream/55"
             >
-              Kontakt & Besuch
+              {eyebrow}
             </motion.p>
 
             <motion.h2
               variants={item}
               className="mt-4 font-serif text-[clamp(42px,5.8vw,88px)] font-bold leading-[1.0] tracking-[-0.02em]"
             >
-              Besuchen
-              <br />
-              Sie <em className="italic text-cs-gold">uns</em>
+              <Emphasize text={heading} className="italic text-cs-gold" />
             </motion.h2>
 
             <motion.p
               variants={item}
               className="mt-6 max-w-[36ch] text-[clamp(14px,1.1vw,17px)] leading-[1.55] text-cs-cream/80"
             >
-              Über 30 Tortensorten, Kleingebäck, Confiserie und Eis aus
-              eigener Herstellung — mitten in Lübeck. Folgen Sie uns auch
-              auf Instagram.
+              {text}
             </motion.p>
 
             <motion.a
@@ -172,7 +184,7 @@ export default function Contact() {
               target="_blank"
               rel="noopener noreferrer"
               className="group mt-[clamp(24px,3vw,44px)] inline-block focus-visible:outline-none"
-              aria-label="Instagram: @cafe_konditorei"
+              aria-label={`Instagram: ${instagramHandle}`}
             >
               <motion.span
                 className="flex items-center gap-[0.4em] whitespace-nowrap text-[clamp(22px,3.2vw,46px)] font-bold tracking-[-0.02em] text-cs-cream transition-colors duration-300 group-hover:text-white group-focus-visible:text-white"
@@ -187,7 +199,7 @@ export default function Contact() {
                   height={52}
                   className="h-[0.9em] w-[0.9em] shrink-0"
                 />
-                @cafe_konditorei
+                {instagramHandle}
               </motion.span>
               <span className="mt-1 block h-[3px] w-full origin-left scale-x-0 rounded-full bg-cs-cream/70 transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100" />
             </motion.a>
@@ -242,8 +254,8 @@ export default function Contact() {
             transition={{ type: "spring", stiffness: 200, damping: 26 }}
           >
             <Image
-              src="/images/contact/innenraum.jpg"
-              alt="Gastraum im Café Steinhusen mit warmem Licht und Lüstern"
+              src={contactImg.src}
+              alt={contactImg.alt}
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover"
@@ -284,7 +296,7 @@ export default function Contact() {
               Sie finden uns hier
             </p>
             <p className="text-[clamp(15px,1.3vw,19px)] font-bold tracking-[-0.01em]">
-              Am Burgfeld 3 · 23568 Lübeck
+              {addressLines.join(" · ")}
             </p>
             <a
               href={MAPS_LINK}

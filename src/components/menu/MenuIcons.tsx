@@ -54,3 +54,20 @@ export function CoffeeIcon({ className }: MenuIconProps) {
   );
 }
 
+/** Named icon registry — lets CMS content reference an icon by string. */
+export const ICONS = {
+  bread: BreadIcon,
+  cake: CakeIcon,
+  cupcake: CupcakeIcon,
+  coffee: CoffeeIcon,
+} as const;
+
+export type MenuIconName = keyof typeof ICONS;
+
+/** Resolve a (possibly null / "none") CMS icon value to an icon component. */
+export function iconFor(
+  name: string | null | undefined,
+): ((props: MenuIconProps) => React.ReactElement) | undefined {
+  return name && name in ICONS ? ICONS[name as MenuIconName] : undefined;
+}
+
