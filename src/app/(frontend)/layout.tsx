@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Cormorant, Grenze_Gotisch } from "next/font/google";
+import Script from "next/script";
 import SmoothScroll from "@/components/SmoothScroll";
 import { getCms } from "@/lib/cms";
 import * as defaults from "@/lib/defaults";
@@ -50,6 +51,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <SmoothScroll>{children}</SmoothScroll>
+        {/* Phillip, the preview agent. The dashboard is blind without this tag. */}
+        <Script
+          src="https://phillip-dashboard-eight.vercel.app/phillip.js"
+          data-preview-id="prv_tavUxmnLYxRUgIkvtWECF"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
