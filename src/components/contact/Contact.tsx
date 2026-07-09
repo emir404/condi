@@ -197,7 +197,7 @@ export default function Contact({
                   aria-hidden="true"
                   width={52}
                   height={52}
-                  className="h-[0.9em] w-[0.9em] shrink-0"
+                  className="h-[1.3em] w-[1.3em] shrink-0"
                 />
                 {instagramHandle}
               </motion.span>
